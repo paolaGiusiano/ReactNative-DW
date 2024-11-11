@@ -16,6 +16,7 @@ const Signup = () => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
+        // Animación para subir el logo cuando el teclado aparece
         Animated.timing(logoPosition, {
           toValue: -100, 
           duration: 300,
@@ -27,8 +28,9 @@ const Signup = () => {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
+        // Animación para devolver el logo a su posición original cuando el teclado se oculta
         Animated.timing(logoPosition, {
-          toValue: 0,
+          toValue: 0, // Regresa el logo a su posición original
           duration: 300,
           useNativeDriver: true,
         }).start();
@@ -48,13 +50,12 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      //const response = await fetch('http://localhost:3001/api/auth/register', {
+        const response = await fetch('http://192.168.1.6:3001/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
       });
-      const data = await response.json();
-
       if (response.ok) {
         await AsyncStorage.setItem('token', data.token);
         navigation.navigate('Feed');

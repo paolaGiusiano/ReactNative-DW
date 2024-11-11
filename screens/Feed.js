@@ -1,3 +1,5 @@
+ //const response = await fetch('http://localhost:3001/api/posts/feed', {
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import PostItem from '../components/PostItem'; 
@@ -12,7 +14,7 @@ const Feed = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const token = await AsyncStorage.getItem('token'); // Obtener el token desde AsyncStorage
+      const token = await AsyncStorage.getItem('token');
 
       if (!token) {
         setError('No estás autenticado');
@@ -21,7 +23,7 @@ const Feed = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:3001/api/posts/feed', {
+        const response = await fetch('http://192.168.1.6:3001/api/posts/feed', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -32,7 +34,7 @@ const Feed = () => {
         const data = await response.json();
 
         if (response.ok) {
-          setPosts(data); // Guardar los posts en el estado
+          setPosts(data);
         } else {
           setError('Error al cargar los posts');
         }
@@ -62,7 +64,7 @@ const Feed = () => {
         <FlatList
           data={posts}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <PostItem post={item} />} // Usar PostItem para cada post
+          renderItem={({ item }) => <PostItem post={item} />} // Usa PostItem para cada post
         />
       )}
     </View>

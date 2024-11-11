@@ -1,13 +1,16 @@
+//const response = await fetch('http://localhost:3001/api/auth/login', {
+
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, Animated, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, Animated, Image, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Input from '../components/Input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons'; // Icono de ojo
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Controla la visibilidad de la contraseña
   const navigation = useNavigation();
   const logoPosition = useRef(new Animated.Value(0)).current; 
 
@@ -42,14 +45,25 @@ const Login = () => {
     };
   }, [logoPosition]);
 
+  const isValidEmail = (email) => {
+    // Expresión regular para validar el formato del correo electrónico
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       setError('Por favor, ingresa ambos campos');
       return;
     }
 
+    if (!isValidEmail(email)) {
+      setError('Por favor, ingresa un correo electrónico válido');
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch('http://192.168.1.6:3001/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -58,7 +72,7 @@ const Login = () => {
 
       if (response.ok) {
         await AsyncStorage.setItem('token', data.token);
-        navigation.navigate('Feed');
+        navigation.replace('MainTabs');
       } else {
         setError(data.message || 'Error en el login');
       }
@@ -75,26 +89,30 @@ const Login = () => {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.innerContainer}>
           <Animated.View style={[styles.logoContainer, { transform: [{ translateY: logoPosition }] }]}>
-            <Image
-              source={require('../assets/instagram-logo2.png')}
-              style={styles.logo}
-            />
+            <Image source={require('../assets/instagram-logo2.png')} style={styles.logo} />
           </Animated.View>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <Input
+          <TextInput
             placeholder="Correo electrónico"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
+            style={styles.input}
           />
-          <Input
-            placeholder="Contraseña"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Contraseña"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!isPasswordVisible}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)} style={styles.eyeIcon}>
+              <Ionicons name={isPasswordVisible ? 'eye-off' : 'eye'} size={24} color="gray" />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Entrar</Text>
@@ -134,6 +152,33 @@ const styles = StyleSheet.create({
   logo: {
     width: 260,
     height: 100,
+  },
+  input: {
+    width: '100%',
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginTop: 10,
+  },
+  passwordContainer: {
+    position: 'relative',
+    width: '100%',
+    marginTop: 10,
+  },
+  passwordInput: {
+    width: '100%',
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    paddingRight: 40, // Espacio para el ícono
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 10,
+    top: '50%',
+    transform: [{ translateY: -12 }], // Centrado vertical
   },
   button: {
     width: '100%',
