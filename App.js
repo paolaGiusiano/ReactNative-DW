@@ -11,6 +11,7 @@ import Feed from './screens/Feed';
 import Profile from './screens/Profile';
 import AddFriend from './screens/AddFriends';
 import Logout from './screens/Logout';
+import UploadPost from './screens/SubirPost';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -56,8 +57,12 @@ const MainTabs = () => (
           iconName = 'home-outline';
         } else if (route.name === 'Profile') {
           iconName = 'person-outline';
-        } else if (route.name === 'AddFriend') {
+        }
+        else if (route.name === 'UploadPost') {
           iconName = 'add-circle-outline';
+        } 
+        else if (route.name === 'AddFriend') {
+          iconName = 'find';
         } else if (route.name === 'LogOut') {
           iconName = 'log-out-outline';
         }
@@ -71,6 +76,7 @@ const MainTabs = () => (
   >
     <Tab.Screen name="Feed" component={Feed} />
     <Tab.Screen name="Profile" component={Profile} />
+    <Tab.Screen name="UploadPost" component={UploadPost} />
     <Tab.Screen name="AddFriend" component={AddFriend} />
     <Tab.Screen name="LogOut" component={Logout} options={{ title: 'Cerrar Sesión' }} />
   </Tab.Navigator>
