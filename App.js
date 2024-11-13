@@ -9,15 +9,19 @@ import Login from './screens/Login';
 import Signup from './screens/Signup';
 import Feed from './screens/Feed';
 import Profile from './screens/Profile';
+import AddFriend from './screens/AddFriends';
+import Logout from './screens/Logout';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const App = () => {
   return (
-    <UserProvider>
-      <NavigationContainer>
+    <NavigationContainer>
+      <UserProvider>
+        {/* Aquí manejas la lógica de si el usuario está autenticado o no */}
         <Stack.Navigator initialRouteName="Login">
+          {/* Pantallas de autenticación */}
           <Stack.Screen 
             name="Login" 
             component={Login} 
@@ -28,49 +32,48 @@ const App = () => {
             component={Signup} 
             options={{ headerShown: false }} 
           />
+
+          {/* Pantallas principales después de iniciar sesión */}
           <Stack.Screen 
-            name="MainTabs" 
+            name="Main" 
             component={MainTabs} 
             options={{ headerShown: false }} 
           />
         </Stack.Navigator>
-      </NavigationContainer>
-    </UserProvider>
+      </UserProvider>
+    </NavigationContainer>
   );
 };
 
-const MainTabs = () => {
-  return (
-    <Tab.Navigator
-      initialRouteName="Feed"
-      screenOptions={{
-        tabBarActiveTintColor: '#3897f0',
-        tabBarInactiveTintColor: '#b0b0b0',
-        tabBarStyle: { height: 60 },
-      }}
-    >
-      <Tab.Screen 
-        name="Feed" 
-        component={Feed}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }} 
-      />
-      <Tab.Screen 
-        name="Profile" 
-        component={Profile}
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }} 
-      />
-    </Tab.Navigator>
-  );
-};
+// Este es el TabNavigator que contiene las pantallas principales.
+const MainTabs = () => (
+  <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        let iconName;
+
+        if (route.name === 'Feed') {
+          iconName = 'home-outline';
+        } else if (route.name === 'Profile') {
+          iconName = 'person-outline';
+        } else if (route.name === 'AddFriend') {
+          iconName = 'add-circle-outline';
+        } else if (route.name === 'LogOut') {
+          iconName = 'log-out-outline';
+        }
+
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: '#3897f0',
+      tabBarInactiveTintColor: 'gray',
+      headerShown: false, // Ocultar encabezado en cada pantalla
+    })}
+  >
+    <Tab.Screen name="Feed" component={Feed} />
+    <Tab.Screen name="Profile" component={Profile} />
+    <Tab.Screen name="AddFriend" component={AddFriend} />
+    <Tab.Screen name="LogOut" component={Logout} options={{ title: 'Cerrar Sesión' }} />
+  </Tab.Navigator>
+);
 
 export default App;

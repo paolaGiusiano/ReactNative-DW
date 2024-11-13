@@ -1,26 +1,23 @@
-//const response = await fetch('http://localhost:3001/api/auth/login', {
-
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, Animated, Image, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, Animated, Image, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons'; // Icono de ojo
+import { Ionicons } from '@expo/vector-icons';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Controla la visibilidad de la contraseña
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigation = useNavigation();
   const logoPosition = useRef(new Animated.Value(0)).current; 
-
+  const token = AsyncStorage.getItem('token');
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        // Animación para subir el logo
         Animated.timing(logoPosition, {
-          toValue: -80, 
+          toValue: -80,
           duration: 300,
           useNativeDriver: true,
         }).start();
@@ -30,7 +27,6 @@ const Login = () => {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        // Animación para devolver el logo a su posición original
         Animated.timing(logoPosition, {
           toValue: 0,
           duration: 300,
@@ -46,7 +42,6 @@ const Login = () => {
   }, [logoPosition]);
 
   const isValidEmail = (email) => {
-    // Expresión regular para validar el formato del correo electrónico
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
   };
@@ -63,21 +58,32 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch('http://192.168.1.6:3001/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch('http://192.168.1.13:3001/api/auth/login', {
+      //const response = await fetch('http://10.0.2.2:3001/api/auth/login', {  
+      method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Asegúrate de definir `token` si es necesario
+        },
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
 
       if (response.ok) {
         await AsyncStorage.setItem('token', data.token);
-        navigation.replace('MainTabs');
+        await AsyncStorage.setItem('username', data.username);
+        await AsyncStorage.setItem('id', data._id);
+        await AsyncStorage.setItem('photoProfile', data.profilePicture);
+
+        console.log('Login exitoso', data);
+        navigation.navigate('Main');
       } else {
         setError(data.message || 'Error en el login');
+        Alert.alert('Login Fallido', data.message || 'Error en el login');
       }
     } catch (error) {
       setError('Error al conectar con el servidor');
+      Alert.alert('Error', 'Error al conectar con el servidor');
     }
   };
 
@@ -129,6 +135,9 @@ const Login = () => {
     </KeyboardAvoidingView>
   );
 };
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -211,3 +220,5 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
+
+

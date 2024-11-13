@@ -1,16 +1,12 @@
- //const response = await fetch('http://localhost:3001/api/posts/feed', {
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import PostItem from '../components/PostItem'; 
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -23,7 +19,8 @@ const Feed = () => {
       }
 
       try {
-        const response = await fetch('http://192.168.1.6:3001/api/posts/feed', {
+        const response = await fetch('http://192.168.1.13:3001/api/posts/feed', {
+        //const response = await fetch('http://10.0.2.2:3001/api/posts/feed', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -59,12 +56,12 @@ const Feed = () => {
   return (
     <View style={styles.container}>
       {posts.length === 0 ? (
-        <Text>No hay posts para mostrar.</Text>
+        <Text style={styles.noPosts}>No hay posts para mostrar.</Text>
       ) : (
         <FlatList
           data={posts}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <PostItem post={item} />} // Usa PostItem para cada post
+          renderItem={({ item }) => <PostItem post={item} />}
         />
       )}
     </View>
@@ -85,6 +82,14 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+  },
+  noPosts: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#777',
   },
 });
 

@@ -50,15 +50,16 @@ const Signup = () => {
     }
 
     try {
-      //const response = await fetch('http://localhost:3001/api/auth/register', {
-        const response = await fetch('http://192.168.1.6:3001/api/auth/register', {
+        const response = await fetch('http://192.168.1.13:3001/api/auth/register', {
+        //const response = await fetch('http://10.0.2.2:3001/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
       });
+      const data = await response.json();
       if (response.ok) {
         await AsyncStorage.setItem('token', data.token);
-        navigation.navigate('Feed');
+        navigation.navigate('Main');
       } else {
         setError(data.message || 'Error en el registro');
       }
